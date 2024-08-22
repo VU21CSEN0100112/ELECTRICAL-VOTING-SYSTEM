@@ -1,0 +1,64 @@
+import hashlib
+
+class VotingMachine:
+    def __init__(self):
+        self._registered_voters = {}
+        self._available_candidates = ["Candidate A", "Candidate B", "Candidate C"]
+        self._vote_count = {}
+
+    def add_voter(self, id_number):
+        """Register a new voter by hashing their ID for anonymity."""
+        hashed_id = hashlib.sha256(id_number.encode()).hexdigest()
+        self._registered_voters[hashed_id] = False
+        print(f"Voter with ID {id_number} has been successfully added.")
+
+    def vote(self, id_number, candidate_name):
+        """Cast a vote for a candidate."""
+        hashed_id = hashlib.sha256(id_number.encode()).hexdigest()
+
+        if hashed_id not in self._registered_voters:
+            print("Error: Voter is not registered.")
+            return
+
+        if self._registered_voters[hashed_id]:
+            print("Error: This voter has already voted.")
+            return
+
+        if candidate_name not in self._available_candidates:
+            print("Error: Invalid candidate.")
+            return
+
+        self._registered_voters[hashed_id] = True
+        if candidate_name in self._vote_count:
+            self._vote_count[candidate_name] += 1
+        else:
+            self._vote_count[candidate_name] = 1
+
+        print(f"Vote recorded for {candidate_name}.")
+
+    def display_results(self):
+        """Display the election results."""
+        print("\nElection Results:")
+        for candidate, count in self._vote_count.items():
+            print(f"{candidate}: {count} votes")
+        print()
+
+def run_voting_simulation():
+    voting_system = VotingMachine()
+
+    # Adding voters
+    voting_system.add_voter("user001")
+    voting_system.add_voter("user002")
+    voting_system.add_voter("user003")
+
+    # Voting process
+    voting_system.vote("user001", "Candidate A")
+    voting_system.vote("user002", "Candidate B")
+    voting_system.vote("user001", "Candidate C")  # This should fail
+    voting_system.vote("user003", "Candidate A")
+
+    # Display results
+    voting_system.display_results()
+
+if __name__ == "__main__":
+    run_voting_simulation()
